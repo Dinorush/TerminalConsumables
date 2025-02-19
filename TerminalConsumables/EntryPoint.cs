@@ -1,10 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using TerminalConsumables.Managers;
 
 namespace TerminalConsumables
 {
-    [BepInPlugin("Dinorush." + MODNAME, MODNAME, "1.0.0")]
+    [BepInPlugin("Dinorush." + MODNAME, MODNAME, "1.1.0")]
     [BepInDependency("dev.gtfomodding.gtfo-api", BepInDependency.DependencyFlags.HardDependency)]
     internal sealed class EntryPoint : BasePlugin
     {
@@ -13,7 +14,7 @@ namespace TerminalConsumables
         public override void Load()
         {
             new Harmony(MODNAME).PatchAll();
-            GTFO.API.LevelAPI.OnLevelCleanup += PickupManager.OnLevelCleanup;
+            GTFO.API.LevelAPI.OnLevelCleanup += TerminalItemManager.OnLevelCleanup;
             Log.LogMessage("Loaded " + MODNAME);
         }
     }
