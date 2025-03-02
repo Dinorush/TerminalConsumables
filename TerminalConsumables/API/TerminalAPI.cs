@@ -18,7 +18,7 @@ namespace TerminalConsumables.API
     /// PING STATUS: ...</code>
     /// </param>
     /// <returns></returns>
-    public delegate List<string> QueryTextOverride(ItemInLevel item, iTerminalItem terminalItem, List<string> defaultDetails);
+    public delegate List<string> QueryTextOverride(Item item, iTerminalItem terminalItem, List<string> defaultDetails);
 
     public static class TerminalAPI
     {
@@ -31,7 +31,7 @@ namespace TerminalConsumables.API
         /// <returns>
         /// A struct containing the newly created iTerminalItem and its item key string.
         /// </returns>
-        public static iTerminalItem RegisterTerminalItem(ItemInLevel item,  bool ammoRel = true, QueryTextOverride? queryOverride = null) => TerminalItemManager.AddTerminalItem(item, ammoRel, queryOverride);
+        public static iTerminalItem RegisterTerminalItem(Item item,  bool ammoRel = true, QueryTextOverride? queryOverride = null) => TerminalItemManager.AddTerminalItem(item, ammoRel, queryOverride);
 
         /// <summary>
         /// Modifies query-related options for the terminal item. If the item is not tracked, it is registered as a tracked item.
@@ -53,6 +53,6 @@ namespace TerminalConsumables.API
         /// <returns>
         /// A struct containing the newly created iTerminalItem and its item key string.
         /// </returns>
-        public static bool ModifyTerminalItem(ItemInLevel item, bool ammoRel = true, QueryTextOverride? queryOverride = null) => ModifyTerminalItem(item.GetComponent<iTerminalItem>(), ammoRel, queryOverride);
+        public static bool ModifyTerminalItem(Item item, bool ammoRel = true, QueryTextOverride? queryOverride = null) => ModifyTerminalItem(item.GetComponent<iTerminalItem>(), ammoRel, queryOverride);
     }
 }

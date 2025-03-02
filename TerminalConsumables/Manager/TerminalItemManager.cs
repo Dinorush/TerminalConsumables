@@ -11,7 +11,7 @@ namespace TerminalConsumables.Managers
 
         public struct QueryInfo
         {
-            public ItemInLevel item;
+            public Item item;
             public bool ammoRel;
             public QueryTextOverride? queryTextOverride;
         }
@@ -32,7 +32,7 @@ namespace TerminalConsumables.Managers
             return true;
         }
 
-        public static iTerminalItem AddTerminalItem(ItemInLevel item, bool ammoRel = true, QueryTextOverride? queryOverride = null)
+        public static iTerminalItem AddTerminalItem(Item item, bool ammoRel = true, QueryTextOverride? queryOverride = null)
         {
             var terminalItem = item.GetComponent<iTerminalItem>();
             if (terminalItem != null)
@@ -51,7 +51,9 @@ namespace TerminalConsumables.Managers
             terminalItem.FloorItemStatus = eFloorInventoryObjectStatus.Normal;
 
             terminalItem.Setup(itemKey);
-            item.internalSync.add_OnSyncStateChange((Action<ePickupItemStatus, pPickupPlacement, Player.PlayerAgent, bool>)(
+            
+            var sync = item.TryCast<ItemInLevel>()?.internalSync;
+            sync?.add_OnSyncStateChange((Action<ePickupItemStatus, pPickupPlacement, Player.PlayerAgent, bool>)(
                 (ePickupItemStatus status, pPickupPlacement placement, Player.PlayerAgent player, bool isRecall) =>
                 {
                     switch (status)
