@@ -29,20 +29,5 @@ namespace TerminalConsumables.Patches
                 __instance.m_terminalItem.FloorItemLocation = courseNode.m_zone.NavInfo.GetFormattedText(LG_NavInfoFormat.Full_And_Number_With_Underscore);
             }
         }
-
-        [HarmonyPatch(typeof(LG_ComputerTerminalCommandInterpreter), nameof(LG_ComputerTerminalCommandInterpreter.Query))]
-        [HarmonyPrefix]
-        static bool Prefix(LG_ComputerTerminalCommandInterpreter __instance, string param1)
-        {
-            if (!LG_LevelInteractionManager.TryGetTerminalInterface(param1.ToUpper(), __instance.m_terminal.SpawnNode.m_dimension.DimensionIndex, out var target)) return true;
-
-            if (!TerminalItemManager.HasTerminal(target)) return true;
-
-            __instance.AddOutput(TerminalLineType.SpinningWaitDone, "Querying " + param1.ToUpper(), 3f);
-            __instance.AddOutputEmptyLine();
-            TerminalItemManager.DoQueryOutput(target, __instance);
-            __instance.AddOutputEmptyLine();
-            return false;
-        }
     }
 }

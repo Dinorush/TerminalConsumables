@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using TerminalConsumables.API;
+using TerminalQueryAPI;
 
 namespace TerminalConsumables.Managers
 {
@@ -29,7 +30,8 @@ namespace TerminalConsumables.Managers
             queryInfo.ammoRel = ammoRel;
             queryInfo.queryTextOverride = queryOverride;
             _terminalInfo[terminalItem.Pointer] = queryInfo;
-            return true;
+
+            return QueryableAPI.ModifyQueryableItem(terminalItem, GetQueryDelegate(queryInfo.item, terminalItem, queryInfo.ammoRel, queryInfo.queryTextOverride));
         }
 
         public static iTerminalItem AddTerminalItem(Item item, bool ammoRel = true, QueryTextOverride? queryOverride = null)
@@ -72,9 +74,46 @@ namespace TerminalConsumables.Managers
                     }
                 }));
 
+            // For still tracking the iteminlevel when modifying
             _terminalInfo.Add(terminalItem.Pointer, new QueryInfo { item = item, ammoRel = ammoRel, queryTextOverride = queryOverride });
 
+            QueryDelegate del = GetQueryDelegate(item, terminalItem, ammoRel, queryOverride);
+            QueryableAPI.RegisterQueryableItem(terminalItem, del);
+
             return terminalItem;
+        }
+
+        public static QueryDelegate GetQueryDelegate(Item item, iTerminalItem terminalItem, bool ammoRel = true, QueryTextOverride? queryOverride = null)
+        {
+            var consumable = item.TryCast<ConsumablePickup_Core>();
+            if (queryOverride != null)
+                return (List<string> defaultDetails) => queryOverride(item, terminalItem, defaultDetails); // Has override
+            else if (consumable != null)
+                return (List<string> defaultDetails) => GetConsumableQueryInfo(defaultDetails, consumable, ammoRel); // Is consumable
+            else 
+                return (List<string> defaultDetails) => defaultDetails; // Default
+        }
+
+        public static List<string> GetConsumableQueryInfo(List<string> defaultDetails, ConsumablePickup_Core consumable,  bool ammoRel = true)
+        {
+            var datablock = consumable.ItemDataBlock;
+            List<string> output = new()
+            {
+                "----------------------------------------------------------------",
+                "CONSUMABLE - " + datablock.terminalItemLongName.ToString()
+            };
+
+            if (!datablock.GUIShowAmmoInfinite) // for ex LRFs 
+            {
+                if (datablock.ConsumableAmmoMax > 0 && ammoRel)
+                    output.Add("CAPACITY: " + (consumable.pItemData.custom.ammo / datablock.ConsumableAmmoMax).ToString("P0"));
+                else
+                    output.Add("CAPACITY: " + consumable.pItemData.custom.ammo.ToString("N0"));
+            }
+            
+            output.AddRange(defaultDetails);
+
+            return output;
         }
 
         public static void DoQueryOutput(iTerminalItem terminalItem, LG_ComputerTerminalCommandInterpreter interpreter)
