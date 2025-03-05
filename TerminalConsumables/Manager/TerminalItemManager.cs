@@ -115,42 +115,6 @@ namespace TerminalConsumables.Managers
             return output;
         }
 
-        public static void DoQueryOutput(iTerminalItem terminalItem, LG_ComputerTerminalCommandInterpreter interpreter)
-        {
-            if (!_terminalInfo.TryGetValue(terminalItem.Pointer, out var queryInfo)) return;
-
-            var item = queryInfo.item;
-
-            string pingStatus = interpreter.GetPingStatus(terminalItem);
-            var details = interpreter.GetDefaultDetails(terminalItem, pingStatus);
-            List<string> defaultDetails = new(details.Count);
-            foreach (string line in details)
-                defaultDetails.Add(line);
-
-            List<string> output;
-            if (queryInfo.queryTextOverride != null)
-                output = queryInfo.queryTextOverride(item, terminalItem, defaultDetails);
-            else
-            {
-                var datablock = item.ItemDataBlock;
-                output = new()
-                {
-                    "----------------------------------------------------------------",
-                    "CONSUMABLE - " + datablock.terminalItemLongName.ToString()
-                };
-                if (datablock.ConsumableAmmoMax > 0 && queryInfo.ammoRel)
-                    output.Add("CAPACITY: " + (item.pItemData.custom.ammo / datablock.ConsumableAmmoMax).ToString("P0"));
-                else
-                    output.Add("CAPACITY: " + item.pItemData.custom.ammo.ToString("N0"));
-                output.AddRange(defaultDetails);
-            }
-
-            foreach (var line in output)
-                interpreter.AddOutput(line, spacing: false);
-        }
-
-        public static bool HasTerminal(iTerminalItem terminalItem) => _terminalInfo.ContainsKey(terminalItem.Pointer);
-
         internal static void OnLevelCleanup()
         {
             _terminalInfo.Clear();
