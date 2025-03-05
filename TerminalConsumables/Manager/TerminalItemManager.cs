@@ -31,7 +31,7 @@ namespace TerminalConsumables.Managers
             queryInfo.queryTextOverride = queryOverride;
             _terminalInfo[terminalItem.Pointer] = queryInfo;
 
-            return QueryableAPI.ModifyQueryableItem(terminalItem, GetQueryDelegate(queryInfo.item, terminalItem, queryInfo.ammoRel, queryInfo.queryTextOverride));
+            return QueryableAPI.ModifyQueryableItem(terminalItem, GetQueryDelegate(terminalItem, queryInfo));
         }
 
         public static iTerminalItem AddTerminalItem(ItemInLevel item, bool ammoRel = true, QueryTextOverride? queryOverride = null)
@@ -43,6 +43,7 @@ namespace TerminalConsumables.Managers
                 return terminalItem;
             }
 
+            // Setup terminal item
             var data = item.ItemDataBlock;
             string itemKey = data.terminalItemShortName;
             if (data.addSerialNumberToName)
@@ -54,6 +55,7 @@ namespace TerminalConsumables.Managers
 
             terminalItem.Setup(itemKey);
             
+            // Add/remove from terminal on pickup/drop
             item.internalSync.add_OnSyncStateChange((Action<ePickupItemStatus, pPickupPlacement, Player.PlayerAgent, bool>)(
                 (ePickupItemStatus status, pPickupPlacement placement, Player.PlayerAgent player, bool isRecall) =>
                 {
@@ -74,21 +76,22 @@ namespace TerminalConsumables.Managers
                 }));
 
             // For still tracking the iteminlevel when modifying
-            _terminalInfo.Add(terminalItem.Pointer, new QueryInfo { item = item, ammoRel = ammoRel, queryTextOverride = queryOverride });
+            var queryInfo = new QueryInfo { item = item, ammoRel = ammoRel, queryTextOverride = queryOverride };
+            _terminalInfo.Add(terminalItem.Pointer, queryInfo);
 
-            QueryDelegate del = GetQueryDelegate(item, terminalItem, ammoRel, queryOverride);
+            QueryDelegate del = GetQueryDelegate(terminalItem, queryInfo);
             QueryableAPI.RegisterQueryableItem(terminalItem, del);
 
             return terminalItem;
         }
 
-        public static QueryDelegate GetQueryDelegate(ItemInLevel item, iTerminalItem terminalItem, bool ammoRel = true, QueryTextOverride? queryOverride = null)
+        public static QueryDelegate GetQueryDelegate(iTerminalItem terminalItem, QueryInfo queryInfo)
         {
-            var consumable = item.TryCast<ConsumablePickup_Core>();
-            if (queryOverride != null)
-                return (List<string> defaultDetails) => queryOverride(item, terminalItem, defaultDetails); // Has override
+            var consumable = queryInfo.item.TryCast<ConsumablePickup_Core>();
+            if (queryInfo.queryTextOverride != null)
+                return (List<string> defaultDetails) => queryInfo.queryTextOverride(queryInfo.item, terminalItem, defaultDetails); // Has override
             else if (consumable != null)
-                return (List<string> defaultDetails) => GetConsumableQueryInfo(defaultDetails, consumable, ammoRel); // Is consumable
+                return (List<string> defaultDetails) => GetConsumableQueryInfo(defaultDetails, consumable, queryInfo.ammoRel); // Is consumable
             else 
                 return (List<string> defaultDetails) => defaultDetails; // Default
         }

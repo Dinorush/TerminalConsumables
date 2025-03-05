@@ -34,6 +34,6 @@
 	<!-- Plugins -->
 	<ItemGroup>
 		<Reference Include="$(PluginsFolder)/GTFO-API.dll" Private="false" />
-    <Reference Include="$(PluginsFolder)/*TerminalQueryAPI/TerminalQueryAPI.dll" Private="false" />
+		<Reference Include="$(PluginsFolder)/**/TerminalQueryAPI.dll" Private="false" />
 	</ItemGroup>
 </Project>
