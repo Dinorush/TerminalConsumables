@@ -12,7 +12,7 @@ namespace TerminalConsumables.Managers
 
         public struct QueryInfo
         {
-            public Item item;
+            public ItemInLevel item;
             public bool ammoRel;
             public QueryTextOverride? queryTextOverride;
         }
@@ -34,7 +34,7 @@ namespace TerminalConsumables.Managers
             return QueryableAPI.ModifyQueryableItem(terminalItem, GetQueryDelegate(queryInfo.item, terminalItem, queryInfo.ammoRel, queryInfo.queryTextOverride));
         }
 
-        public static iTerminalItem AddTerminalItem(Item item, bool ammoRel = true, QueryTextOverride? queryOverride = null)
+        public static iTerminalItem AddTerminalItem(ItemInLevel item, bool ammoRel = true, QueryTextOverride? queryOverride = null)
         {
             var terminalItem = item.GetComponent<iTerminalItem>();
             if (terminalItem != null)
@@ -54,8 +54,7 @@ namespace TerminalConsumables.Managers
 
             terminalItem.Setup(itemKey);
             
-            var sync = item.TryCast<ItemInLevel>()?.internalSync;
-            sync?.add_OnSyncStateChange((Action<ePickupItemStatus, pPickupPlacement, Player.PlayerAgent, bool>)(
+            item.internalSync.add_OnSyncStateChange((Action<ePickupItemStatus, pPickupPlacement, Player.PlayerAgent, bool>)(
                 (ePickupItemStatus status, pPickupPlacement placement, Player.PlayerAgent player, bool isRecall) =>
                 {
                     switch (status)
@@ -83,7 +82,7 @@ namespace TerminalConsumables.Managers
             return terminalItem;
         }
 
-        public static QueryDelegate GetQueryDelegate(Item item, iTerminalItem terminalItem, bool ammoRel = true, QueryTextOverride? queryOverride = null)
+        public static QueryDelegate GetQueryDelegate(ItemInLevel item, iTerminalItem terminalItem, bool ammoRel = true, QueryTextOverride? queryOverride = null)
         {
             var consumable = item.TryCast<ConsumablePickup_Core>();
             if (queryOverride != null)
