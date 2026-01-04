@@ -1,6 +1,5 @@
 ﻿using GameData;
 using HarmonyLib;
-using LevelGeneration;
 using TerminalConsumables.Managers;
 
 namespace TerminalConsumables.Patches
