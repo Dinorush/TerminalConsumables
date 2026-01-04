@@ -6,7 +6,7 @@ using TerminalQueryAPI;
 
 namespace TerminalConsumables
 {
-    [BepInPlugin("Dinorush." + MODNAME, MODNAME, "1.2.0")]
+    [BepInPlugin("Dinorush." + MODNAME, MODNAME, "1.2.2")]
     [BepInDependency("dev.gtfomodding.gtfo-api", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency(QueryableAPI.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
     internal sealed class EntryPoint : BasePlugin
